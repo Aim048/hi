@@ -1,0 +1,599 @@
+-- Enable secure mode
+getgenv().SecureMode = true
+
+-- Load Orion Library
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({
+    IntroText = "Murder Time",
+    Name = [[<font color="rgb(255,0,0)">INSANITY</font>]],
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = ""
+})
+
+-- Notifier function
+local function notify(message, duration)
+    OrionLib:MakeNotification({
+        Name = "Notification",
+        Content = message,
+        Duration = duration or 5
+    })
+end
+
+-- Main Tab
+local MainTab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://15862434941",
+    PremiumOnly = false
+})
+
+MainTab:AddSection({
+    Name = "Made by #Aim048"
+})
+
+MainTab:AddLabel("Welcome To Premium Pass Enjoy!")
+
+-- Hitbox Expander
+MainTab:AddTextbox({
+    Name = "Hitbox Expander",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        _G.HeadSize = tonumber(value) or 1 -- Default to 1 if invalid
+        _G.Disabled = true
+
+        game:GetService('RunService').RenderStepped:Connect(function()
+            if _G.Disabled then
+                for _, player in pairs(game:GetService('Players'):GetPlayers()) do
+                    if player.Name ~= game:GetService('Players').LocalPlayer.Name then
+                        pcall(function()
+                            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                player.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                                player.Character.HumanoidRootPart.Transparency = 0.9
+                                player.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really blue")
+                                player.Character.HumanoidRootPart.Material = "Neon"
+                                player.Character.HumanoidRootPart.CanCollide = false
+                            end
+                        end)
+                    end
+                end
+            end
+        end)
+    end
+})
+
+-- Speed Changer
+MainTab:AddTextbox({
+    Name = "Speed Changer",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        getgenv().Walkspeed = tonumber(value) or 16 -- Default to 16 if invalid
+        pcall(function()
+            game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().Walkspeed
+        end)
+    end
+})
+
+-- Loop Speed Changer
+MainTab:AddToggle({
+    Name = "Loop Speed Changer",
+    Default = false,
+    Callback = function(state)
+        getgenv().loopW = state
+        game:GetService("RunService").Heartbeat:Connect(function()
+            if loopW then
+                pcall(function()
+                    game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().Walkspeed
+                end)
+            end
+        end)
+    end
+})
+
+-- Jump Power
+MainTab:AddTextbox({
+    Name = "Jump Power",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        getgenv().Jumppower = tonumber(value) or 50 -- Default to 50 if invalid
+        pcall(function()
+            game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = getgenv().Jumppower
+        end)
+    end
+})
+
+-- Loop Jump Power
+MainTab:AddToggle({
+    Name = "Loop Jump Power",
+    Default = false,
+    Callback = function(state)
+        getgenv().loopJ = state
+        game:GetService("RunService").Heartbeat:Connect(function()
+            if loopJ then
+                pcall(function()
+                    game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = getgenv().Jumppower
+                end)
+            end
+        end)
+    end
+})
+
+-- Field of View Changer
+MainTab:AddTextbox({
+    Name = "Field of View",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        local FovNumber = tonumber(value) or 70 -- Default to 70 if invalid
+        local Camera = workspace.CurrentCamera
+        Camera.FieldOfView = FovNumber
+        notify("Field of View set to: " .. FovNumber)
+    end
+})
+
+-- Infinite Jump Button
+MainTab:AddButton({
+    Name = "Infinite Jump",
+    Callback = function()
+        notify("Infinite Jump enabled!")
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/BsGlitch/-nfJumps/main/BsGlitch"))()
+    end
+})
+
+-- Noclip Button
+MainTab:AddButton({
+    Name = "Noclip",
+    Callback = function()
+        notify("Noclip enabled!")
+        loadstring(game:HttpGet("https://pastebin.com/raw/KAKCnsmS"))()
+    end
+})
+
+-- ESP Tab
+local ESPTab = Window:MakeTab({
+    Name = "ESP",
+    Icon = "rbxassetid://15862434941", -- Add your own icon here
+    PremiumOnly = false
+})
+
+ESPTab: AddButton({
+	Name = "Esp Name",
+	Callback = function(value)
+		print(value)
+local c = workspace.CurrentCamera
+local ps = game:GetService("Players")
+local lp = ps.LocalPlayer
+local rs = game:GetService("RunService")
+
+local function esp(p,cr)
+	local h = cr:WaitForChild("Humanoid")
+	local hrp = cr:WaitForChild("Head")
+
+	local text = Drawing.new("Text")
+	text.Visible = false
+	text.Center = true
+	text.Outline = false 
+	text.Font = 3
+	text.Size = 16.16
+	text.Color = Color3.new(170,170,170)
+
+	local conection
+	local conection2
+	local conection3
+
+	local function dc()
+		text.Visible = false
+		text:Remove()
+		if conection then
+			conection:Disconnect()
+			conection = nil 
+		end
+		if conection2 then
+			conection2:Disconnect()
+			conection2 = nil 
+		end
+		if conection3 then
+			conection3:Disconnect()
+			conection3 = nil 
+		end
+	end
+
+	conection2 = cr.AncestryChanged:Connect(function(_,parent)
+		if not parent then
+			dc()
+		end
+	end)
+
+	conection3 = h.HealthChanged:Connect(function(v)
+		if (v<=0) or (h:GetState() == Enum.HumanoidStateType.Dead) then
+			dc()
+		end
+	end)
+
+	conection = rs.RenderStepped:Connect(function()
+		local hrp_pos,hrp_onscreen = c:WorldToViewportPoint(hrp.Position)
+		if hrp_onscreen then
+			text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y - 27)
+			text.Text = "[ "..p.Name.." ]"
+			text.Visible = true
+		else
+			text.Visible = false
+		end
+	end)
+end
+
+local function p_added(p)
+	if p.Character then
+		esp(p,p.Character)
+	end
+	p.CharacterAdded:Connect(function(cr)
+		esp(p,cr)
+	end)
+end
+
+for i,p in next, ps:GetPlayers() do 
+	if p ~= lp then
+		p_added(p)
+	end
+end
+
+ps.PlayerAdded:Connect(p_added)
+end
+})
+
+
+ESPTab: AddButton({
+	Name = "outline box",
+	Callback = function(value)
+		print(value)
+local plr = game.Players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+for i, v in pairs(game.Players:GetChildren()) do
+    local Top = Drawing.new("Line")
+    Top.Visible = false
+    Top.From = Vector2.new(0, 0)
+    Top.To = Vector2.new(200, 200)
+    Top.Color = Color3.fromRGB(255, 0, 0)
+    Top.Thickness = 2
+    Top.Transparency = 1
+
+    local Bottom = Drawing.new("Line")
+    Bottom.Visible = false
+    Bottom.From = Vector2.new(0, 0)
+    Bottom.To = Vector2.new(200, 200)
+    Bottom.Color = Color3.fromRGB(255, 0, 0)
+    Bottom.Thickness = 2
+    Bottom.Transparency = 1
+
+    local Left = Drawing.new("Line")
+    Left.Visible = false
+    Left.From = Vector2.new(0, 0)
+    Left.To = Vector2.new(200, 200)
+    Left.Color = Color3.fromRGB(255, 0, 0)
+    Left.Thickness = 2
+    Left.Transparency = 1
+
+    local Right = Drawing.new("Line")
+    Right.Visible = false
+    Right.From = Vector2.new(0, 0)
+    Right.To = Vector2.new(200, 200)
+    Right.Color = Color3.fromRGB(255, 0, 0)
+    Right.Thickness = 2
+    Right.Transparency = 1
+
+    function ESP()
+        local connection
+        connection = game:GetService("RunService").RenderStepped:Connect(function()
+            if v.Character ~= nil and v.Character:FindFirstChild("HumanoidRootPart") ~= nil and v.Name ~= plr.Name and v.Character.Humanoid.Health > 0 then 
+                local ScreenPos, OnScreen = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                if OnScreen then
+                    local Scale = v.Character.Head.Size.Y/2
+                    local Size = Vector3.new(2, 3, 0) * (Scale * 2)
+                    local humpos = camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                    local TL = camera:WorldToViewportPoint((v.Character.HumanoidRootPart.CFrame * CFrame.new(Size.X, Size.Y, 0)).p)
+                    local TR = camera:WorldToViewportPoint((v.Character.HumanoidRootPart.CFrame * CFrame.new(-Size.X, Size.Y, 0)).p)
+                    local BL = camera:WorldToViewportPoint((v.Character.HumanoidRootPart.CFrame * CFrame.new(Size.X, -Size.Y, 0)).p)
+                    local BR = camera:WorldToViewportPoint((v.Character.HumanoidRootPart.CFrame * CFrame.new(-Size.X, -Size.Y, 0)).p)
+
+                    Top.From = Vector2.new(TL.X, TL.Y)
+                    Top.To = Vector2.new(TR.X, TR.Y)
+
+                    Left.From = Vector2.new(TL.X, TL.Y)
+                    Left.To = Vector2.new(BL.X, BL.Y)
+
+                    Right.From = Vector2.new(TR.X, TR.Y)
+                    Right.To = Vector2.new(BR.X, BR.Y)
+
+                    Bottom.From = Vector2.new(BL.X, BL.Y)
+                    Bottom.To = Vector2.new(BR.X, BR.Y)
+
+                    if v.TeamColor == plr.TeamColor then
+                        Top.Color = Color3.fromRGB(0, 255, 0)
+                        Left.Color = Color3.fromRGB(0, 255, 0)
+                        Bottom.Color = Color3.fromRGB(0, 255, 0)
+                        Right.Color = Color3.fromRGB(0, 255, 0)
+                    else 
+                        Top.Color = Color3.fromRGB(255, 0, 0)
+                        Left.Color = Color3.fromRGB(255, 0, 0)
+                        Bottom.Color = Color3.fromRGB(255, 0, 0)
+                        Right.Color = Color3.fromRGB(255, 0, 0)
+                    end
+
+                    Top.Visible = true
+                    Left.Visible = true
+                    Bottom.Visible = true
+                    Right.Visible = true
+                else 
+                    Top.Visible = false
+                    Left.Visible = false
+                    Bottom.Visible = false
+                    Right.Visible = false
+                end
+            else 
+                Top.Visible = false
+                Left.Visible = false
+                Bottom.Visible = false
+                Right.Visible = false
+                if game.Players:FindFirstChild(v.Name) == nil then
+                    connection:Disconnect()
+                end
+            end
+        end)
+    end
+    coroutine.wrap(ESP)()
+end
+
+game.Players.PlayerAdded:Connect(function(newplr) --Parameter gets the new player that has been added
+    local Top = Drawing.new("Line")
+    Top.Visible = false
+    Top.From = Vector2.new(0, 0)
+    Top.To = Vector2.new(200, 200)
+    Top.Color = Color3.fromRGB(255, 0, 0)
+    Top.Thickness = 2
+    Top.Transparency = 1
+
+    local Bottom = Drawing.new("Line")
+    Bottom.Visible = false
+    Bottom.From = Vector2.new(0, 0)
+    Bottom.To = Vector2.new(200, 200)
+    Bottom.Color = Color3.fromRGB(255, 0, 0)
+    Bottom.Thickness = 2
+    Bottom.Transparency = 1
+
+    local Left = Drawing.new("Line")
+    Left.Visible = false
+    Left.From = Vector2.new(0, 0)
+    Left.To = Vector2.new(200, 200)
+    Left.Color = Color3.fromRGB(255, 0, 0)
+    Left.Thickness = 2
+    Left.Transparency = 1
+
+    local Right = Drawing.new("Line")
+    Right.Visible = false
+    Right.From = Vector2.new(0, 0)
+    Right.To = Vector2.new(200, 200)
+    Right.Color = Color3.fromRGB(255, 0, 0)
+    Right.Thickness = 2
+    Right.Transparency = 1
+
+    function ESP()
+        local connection
+        connection = game:GetService("RunService").RenderStepped:Connect(function()
+            if newplr.Character ~= nil and newplr.Character:FindFirstChild("HumanoidRootPart") ~= nil and newplr.Name ~= plr.Name  and newplr.Character.Humanoid.Health > 0 then
+                local ScreenPos, OnScreen = camera:WorldToViewportPoint(newplr.Character.HumanoidRootPart.Position)
+                if OnScreen then
+                    local Scale = newplr.Character.Head.Size.Y/2
+                    local Size = Vector3.new(2, 3, 0) * (Scale * 2)
+                    local humpos = camera:WorldToViewportPoint(newplr.Character.HumanoidRootPart.Position)
+                    local TL = camera:WorldToViewportPoint((newplr.Character.HumanoidRootPart.CFrame * CFrame.new(Size.X, Size.Y, 0)).p)
+                    local TR = camera:WorldToViewportPoint((newplr.Character.HumanoidRootPart.CFrame * CFrame.new(-Size.X, Size.Y, 0)).p)
+                    local BL = camera:WorldToViewportPoint((newplr.Character.HumanoidRootPart.CFrame * CFrame.new(Size.X, -Size.Y, 0)).p)
+                    local BR = camera:WorldToViewportPoint((newplr.Character.HumanoidRootPart.CFrame * CFrame.new(-Size.X, -Size.Y, 0)).p)
+
+                    Top.From = Vector2.new(TL.X, TL.Y)
+                    Top.To = Vector2.new(TR.X, TR.Y)
+
+                    Left.From = Vector2.new(TL.X, TL.Y)
+                    Left.To = Vector2.new(BL.X, BL.Y)
+
+                    Right.From = Vector2.new(TR.X, TR.Y)
+                    Right.To = Vector2.new(BR.X, BR.Y)
+
+                    Bottom.From = Vector2.new(BL.X, BL.Y)
+                    Bottom.To = Vector2.new(BR.X, BR.Y)
+
+                    if newplr.TeamColor == plr.TeamColor then
+                        Top.Color = Color3.fromRGB(0, 255, 0)
+                        Left.Color = Color3.fromRGB(0, 255, 0)
+                        Bottom.Color = Color3.fromRGB(0, 255, 0)
+                        Right.Color = Color3.fromRGB(0, 255, 0)
+                    else 
+                        Top.Color = Color3.fromRGB(255, 0, 0)
+                        Left.Color = Color3.fromRGB(255, 0, 0)
+                        Bottom.Color = Color3.fromRGB(255, 0, 0)
+                        Right.Color = Color3.fromRGB(255, 0, 0)
+                    end
+
+                    Top.Visible = true
+                    Left.Visible = true
+                    Bottom.Visible = true
+                    Right.Visible = true
+                else 
+                    Top.Visible = false
+                    Left.Visible = false
+                    Bottom.Visible = false
+                    Right.Visible = false
+                end
+            else 
+                Top.Visible = false
+                Left.Visible = false
+                Bottom.Visible = false
+                Right.Visible = false
+                if game.Players:FindFirstChild(newplr.Name) == nil then
+                    connection:Disconnect()
+                end
+            end
+        end)
+    end
+    coroutine.wrap(ESP)()
+end)
+end
+})
+
+ESPTab: AddButton({
+	Name = "highlight",
+	Callback = function(value)
+		print(value)
+local FillColor = Color3.fromRGB(65,255,0)
+local DepthMode = "AlwaysOnTop"
+local FillTransparency = 0.5
+local OutlineColor = Color3.fromRGB(255,255,255)
+local OutlineTransparency = 0
+
+local CoreGui = game:FindService("CoreGui")
+local Players = game:FindService("Players")
+local lp = Players.LocalPlayer
+local connections = {}
+
+local Storage = Instance.new("Folder")
+Storage.Parent = CoreGui
+Storage.Name = "Highlight_Storage"
+
+local function Highlight(plr)
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = plr.Name
+    Highlight.FillColor = FillColor
+    Highlight.DepthMode = DepthMode
+    Highlight.FillTransparency = FillTransparency
+    Highlight.OutlineColor = OutlineColor
+    Highlight.OutlineTransparency = 0
+    Highlight.Parent = Storage
+    
+    local plrchar = plr.Character
+    if plrchar then
+        Highlight.Adornee = plrchar
+    end
+
+    connections[plr] = plr.CharacterAdded:Connect(function(char)
+        Highlight.Adornee = char
+    end)
+end
+
+Players.PlayerAdded:Connect(Highlight)
+for i,v in next, Players:GetPlayers() do
+    Highlight(v)
+end
+
+Players.PlayerRemoving:Connect(function(plr)
+    local plrname = plr.Name
+    if Storage[plrname] then
+        Storage[plrname]:Destroy()
+    end
+    if connections[plr] then
+        connections[plr]:Disconnect()
+    end
+end)
+end
+})
+
+ESPTab:AddButton({
+    Name = "outline skeleton",
+    Callback = function(value)
+		print(value) loadstring(game:HttpGet("https://raw.githubusercontent.com/Blissful4992/ESPs/main/SkeletonESP.lua"))()
+    end
+})
+
+
+ESPTab:AddLabel("ESP Settings")
+
+-- Gear Tab
+local GearTab = Window:MakeTab({
+    Name = "Gear",
+    Icon = "rbxassetid://6034818375",
+    PremiumOnly = false
+})
+
+GearTab:AddLabel("Use these tools wisely!")
+
+GearTab:AddButton({
+    Name = "Auto Kill",
+    Callback = function()
+        notify("Auto Kill script loaded!")
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Deni210/murdersvssherrifsduels/main/rubyhub", true))()
+    end
+})
+
+GearTab:AddButton({
+    Name = "Xeno",
+    Callback = function()
+        notify("Xeno script loaded!")
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TheRealAvrwm/Projects/main/Xeno%20MVSD%20script.lua", true))()
+    end
+})
+
+GearTab:AddButton({
+    Name = "Nameless Admin",
+    Callback = function()
+        notify("Nameless Admin script loaded!")
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source'))()
+    end
+})
+
+-- Setting Tab
+local SettingTab = Window:MakeTab({
+    Name = "Settings",
+    Icon = "rbxassetid://15841340999",
+    PremiumOnly = false
+})
+
+SettingTab:AddButton({
+    Name = "Rejoin",
+    Callback = function()
+        notify("Rejoining the game...")
+        local ts = game:GetService("TeleportService")
+        local p = game:GetService("Players").LocalPlayer
+        ts:Teleport(game.PlaceId, p)
+    end
+})
+
+SettingTab:AddButton({
+    Name = "Server Hop",
+    Callback = function()
+        notify("Server hopping...")
+        local module = loadstring(game:HttpGet("https://raw.githubusercontent.com/LeoKholYt/roblox/main/lk_serverhop.lua"))()
+        module:Teleport(game.PlaceId)
+    end
+})
+
+SettingTab:AddButton({
+    Name = "Open Console",
+    Callback = function()
+        notify("Opening console...")
+        game:GetService("StarterGui"):SetCore("DevConsoleVisible", true)
+    end
+})
+
+SettingTab:AddButton({
+    Name = "Anti Ban/Kick Detection",
+    Callback = function()
+        notify("Anti Ban/Kick Detection enabled!")
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+
+        local function preventKick()
+            local TeleportService = game:GetService("TeleportService")
+            TeleportService:Teleport(game.PlaceId, LocalPlayer)
+        end
+
+        Players.PlayerRemoving:Connect(function(player)
+            if player == LocalPlayer then
+                preventKick()
+            end
+        end)
+    end
+})
+
+-- Initialize the GUI
+OrionLib:Init()

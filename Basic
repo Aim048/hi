@@ -1,0 +1,199 @@
+-- Enable secure mode
+getgenv().SecureMode = true
+
+-- Load Orion Library
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({
+    IntroText = "Murder Time",
+    Name = [[<font color="rgb(255,0,0)">INSANITY</font>]],
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = ""
+})
+
+-- Notifier function
+local function notify(message, duration)
+    OrionLib:MakeNotification({
+        Name = "Notification",
+        Content = message,
+        Duration = duration or 5
+    })
+end
+
+-- Main Tab
+local MainTab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://15862434941",
+    PremiumOnly = false
+})
+
+MainTab:AddSection({
+    Name = "Made by #Aim048"
+})
+
+MainTab:AddLabel("Adjust Your Settings Below")
+
+-- Hitbox Expander
+MainTab:AddTextbox({
+    Name = "Hitbox Expander",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        _G.HeadSize = tonumber(value) or 1 -- Default to 1 if invalid
+        _G.Disabled = true
+
+        game:GetService('RunService').RenderStepped:Connect(function()
+            if _G.Disabled then
+                for _, player in pairs(game:GetService('Players'):GetPlayers()) do
+                    if player.Name ~= game:GetService('Players').LocalPlayer.Name then
+                        pcall(function()
+                            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                player.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                                player.Character.HumanoidRootPart.Transparency = 0.9
+                                player.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really blue")
+                                player.Character.HumanoidRootPart.Material = "Neon"
+                                player.Character.HumanoidRootPart.CanCollide = false
+                            end
+                        end)
+                    end
+                end
+            end
+        end)
+    end
+})
+
+-- Speed Changer
+MainTab:AddTextbox({
+    Name = "Speed Changer",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        getgenv().Walkspeed = tonumber(value) or 16 -- Default to 16 if invalid
+        pcall(function()
+            game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().Walkspeed
+        end)
+    end
+})
+
+-- Jump Power
+MainTab:AddTextbox({
+    Name = "Jump Power",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        getgenv().Jumppower = tonumber(value) or 50 -- Default to 50 if invalid
+        pcall(function()
+            game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = getgenv().Jumppower
+        end)
+    end
+})
+
+-- Field of View Changer
+MainTab:AddTextbox({
+    Name = "Field of View",
+    Default = "",
+    TextDisappear = true,
+    Callback = function(value)
+        local FovNumber = tonumber(value) or 70 -- Default to 70 if invalid
+        local Camera = workspace.CurrentCamera
+        Camera.FieldOfView = FovNumber
+        notify("Field of View set to: " .. FovNumber)
+    end
+})
+
+-- Infinite Jump Button
+MainTab:AddButton({
+    Name = "Infinite Jump",
+    Callback = function()
+        notify("Infinite Jump enabled!")
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/BsGlitch/-nfJumps/main/BsGlitch"))()
+    end
+})
+
+-- Noclip Button
+MainTab:AddButton({
+    Name = "Noclip",
+    Callback = function()
+        notify("Noclip enabled!")
+        loadstring(game:HttpGet("https://pastebin.com/raw/KAKCnsmS"))()
+    end
+})
+
+-- ESP Tab
+local ESPTab = Window:MakeTab({
+    Name = "ESP",
+    Icon = "rbxassetid://15862434941",
+    PremiumOnly = false
+})
+
+ESPTab:AddSection({
+    Name = "ESP Settings"
+})
+
+-- ESP Toggle
+ESPTab:AddToggle({
+    Name = "ESP",
+    Default = false,
+    Callback = function(state)
+        getgenv().ESP = state
+        if state then
+            notify("ESP enabled!")
+            game:GetService('RunService').RenderStepped:Connect(function()
+                for _, player in pairs(game:GetService('Players'):GetPlayers()) do
+                    if player.Name ~= game:GetService('Players').LocalPlayer.Name then
+                        pcall(function()
+                            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                local esp = Drawing.new("Text")
+                                esp.Text = player.Name
+                                esp.Size = Vector2.new(50, 50)
+                                esp.Position = player.Character.HumanoidRootPart.Position
+                                esp.Color = Color3.new(1, 0, 0)
+                                esp.Visible = true
+                            end
+                        end)
+                    end
+                end
+            end)
+        else
+            notify("ESP disabled!")
+            game:GetService('RunService').RenderStepped:Disconnect()
+        end
+    end
+})
+
+-- Setting Tab
+local SettingTab = Window:MakeTab({
+    Name = "Settings",
+    Icon = "rbxassetid://15841340999",
+    PremiumOnly = false
+})
+
+SettingTab:AddButton({
+    Name = "Rejoin",
+    Callback = function()
+        notify("Rejoining the game...")
+        local ts = game:GetService("TeleportService")
+        local p = game:GetService("Players").LocalPlayer
+        ts:Teleport(game.PlaceId, p)
+    end
+})
+
+SettingTab:AddButton({
+    Name = "Server Hop",
+    Callback = function()
+        notify("Server hopping...")
+        local module = loadstring(game:HttpGet("https://raw.githubusercontent.com/LeoKholYt/roblox/main/lk_serverhop.lua"))()
+        module:Teleport(game.PlaceId)
+    end
+})
+
+SettingTab:AddButton({
+    Name = "Open Console",
+    Callback = function()
+        notify("Opening console...")
+        game:GetService("StarterGui"):SetCore("DevConsoleVisible", true)
+    end
+})
+
+-- Initialize the GUI
+OrionLib:Init()
