@@ -1,0 +1,318 @@
+local player = game.Players.LocalPlayer 
+local mouse = player:GetMouse() 
+local input = game:GetService("UserInputService") 
+local run = game:GetService("RunService") 
+local tween = game:GetService("TweenService") 
+local tweeninfo = TweenInfo.new 
+local utility = {} 
+local objects = {} 
+local themes = { 
+    Background = Color3.fromRGB(24, 24, 24), 
+    Glow = Color3.fromRGB(0, 0, 0), 
+    Accent = Color3.fromRGB(10, 10, 10), 
+    LightContrast = Color3.fromRGB(20, 20, 20), 
+    DarkContrast = Color3.fromRGB(14, 14, 14), 
+    TextColor = Color3.fromRGB(255, 255, 255) 
+}
+
+do 
+    function utility:Create(instance, properties, children) 
+        local object = Instance.new(instance) 
+        for i, v in pairs(properties or {}) do 
+            object[i] = v 
+            if typeof(v) == "Color3" then 
+                local theme = utility:Find(themes, v) 
+                if theme then 
+                    objects[theme] = objects[theme] or {} 
+                    objects[theme][i] = objects[theme][i] or setmetatable({}, {_mode = "k"}) 
+                    table.insert(objects[theme][i], object) 
+                end 
+            end 
+        end 
+        for i, module in pairs(children or {}) do 
+            module.Parent = object 
+        end 
+        return object 
+    end 
+
+    function utility:Tween(instance, properties, duration, ...) 
+        tween:Create(instance, tweeninfo(duration, ...), properties):Play() 
+    end 
+
+    function utility:Wait() 
+        run.RenderStepped:Wait() 
+        return true 
+    end 
+
+    function utility:Find(table, value) 
+        for i, v in pairs(table) do 
+            if v == value then 
+                return i 
+            end 
+        end 
+    end 
+
+    function utility:DraggingEnabled(frame, parent) 
+        parent = parent or frame 
+        local dragging = false 
+        local dragInput, mousePos, framePos 
+        frame.InputBegan:Connect(function(input) 
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
+                dragging = true 
+                mousePos = input.Position 
+                framePos = parent.Position 
+                input.Changed:Connect(function() 
+                    if input.UserInputState == Enum.UserInputState.End then 
+                        dragging = false 
+                    end 
+                end) 
+            end 
+        end) 
+        frame.InputChanged:Connect(function(input) 
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then 
+                dragInput = input 
+            end 
+        end) 
+        input.InputChanged:Connect(function(input) 
+            if input == dragInput and dragging then 
+                local delta = input.Position - mousePos 
+                parent.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y) 
+            end 
+        end) 
+    end 
+end 
+
+local library = {} 
+local page = {} 
+local section = {} 
+do 
+    library.__index = library 
+    page.__index = page 
+    section.__index = section 
+
+    function library.new(title) 
+        local container = utility:Create("ScreenGui", { 
+            Name = title, 
+            Parent = game.CoreGui 
+        }, { 
+            utility:Create("ImageLabel", { 
+                Name = "Main", 
+                BackgroundTransparency = 1, 
+                Position = UDim2.new(0.25, 0, 0.052435593, 0), 
+                Size = UDim2.new(0, 511, 0, 428), 
+                Image = "rbxassetid://4641149554", 
+                ImageColor3 = themes.Background, 
+                ScaleType = Enum.ScaleType.Slice, 
+                SliceCenter = Rect.new(4, 4, 296, 296) 
+            }, { 
+                utility:Create("ImageLabel", { 
+                    Name = "Glow", 
+                    BackgroundTransparency = 1, 
+                    Position = UDim2.new(0, -15, 0, -15), 
+                    Size = UDim2.new(1, 30, 1, 30), 
+                    ZIndex = 0, 
+                    Image = "rbxassetid://5028857084", 
+                    ImageColor3 = themes.Glow, 
+                    ScaleType = Enum.ScaleType.Slice, 
+                    SliceCenter = Rect.new(24, 24, 276, 276) 
+                }), 
+                utility:Create("ImageLabel", { 
+                    Name = "Pages", 
+                    BackgroundTransparency = 1, 
+                    ClipsDescendants = true, 
+                    Position = UDim2.new(0, 0, 0, 38), 
+                    Size = UDim2.new(0, 126, 1, -38), 
+                    ZIndex = 3, 
+                    Image = "rbxassetid://5012534273", 
+                    ImageColor3 = themes.DarkContrast, 
+                    ScaleType = Enum.ScaleType.Slice, 
+                    SliceCenter = Rect.new(4, 4, 296, 296) 
+                }, { 
+                    utility:Create("ScrollingFrame", { 
+                        Name = "Pages_Container", 
+                        Active = true, 
+                        BackgroundTransparency = 1, 
+                        Position = UDim2.new(0, 0, 0, 10), 
+                        Size = UDim2.new(1, 0, 1, -20), 
+                        CanvasSize = UDim2.new(0, 0, 0, 314), 
+                        ScrollBarThickness = 0 
+                    }, { 
+                        utility:Create("UIListLayout", { 
+                            SortOrder = Enum.SortOrder.LayoutOrder, 
+                            Padding = UDim.new(0, 10) 
+                        }) 
+                    }) 
+                }), 
+                utility:Create("ImageLabel", { 
+                    Name = "TopBar", 
+                    BackgroundTransparency = 1, 
+                    ClipsDescendants = true, 
+                    Size = UDim2.new(1, 0, 0, 38), 
+                    ZIndex = 5, 
+                    Image = "rbxassetid://4595286933", 
+                    ImageColor3 = themes.Accent, 
+                    ScaleType = Enum.ScaleType.Slice, 
+                    SliceCenter = Rect.new(4, 4, 296, 296) 
+                }, { 
+                    utility:Create("TextLabel", { 
+                        Name = "Title", 
+                        AnchorPoint = Vector2.new(0, 0.5), 
+                        BackgroundTransparency = 1, 
+                        Position = UDim2.new(0, 12, 0, 19), 
+                        Size = UDim2.new(1, -46, 0, 16), 
+                        ZIndex = 5, 
+                        Font = Enum.Font.GothamBold, 
+                        Text = title, 
+                        TextColor3 = themes.TextColor, 
+                        TextSize = 14, 
+                        TextXAlignment = Enum.TextXAlignment.Left 
+                    }), 
+                    utility:Create("ImageButton", { 
+                        Name = "CloseButton", 
+                        BackgroundTransparency = 1, 
+                        Position = UDim2.new(1, -26, 0, 8), 
+                        Size = UDim2.new(0, 16, 0, 16), 
+                        Image = "rbxassetid://5012538583", 
+                        ImageColor3 = Color3.fromRGB(255, 255, 255) 
+                    }) 
+                }) 
+            }) 
+        }) 
+        utility:DraggingEnabled(container.Main.TopBar, container.Main) 
+        return setmetatable({ 
+            container = container, 
+            pagesContainer = container.Main.Pages.Pages_Container, 
+            pages = {} 
+        }, library) 
+    end 
+
+    function library:addPage(...) 
+        local page = page.new(self, ...) 
+        local button = page.button 
+        table.insert(self.pages, page) 
+        button.MouseButton1Click:Connect(function() 
+            self:SelectPage(page, true) 
+        end) 
+        return page 
+    end 
+
+    function page.new(library, title, icon) 
+        local button = utility:Create("TextButton", { 
+            Name = title, 
+            Parent = library.pagesContainer, 
+            BackgroundTransparency = 1, 
+            BorderSizePixel = 0, 
+            Size = UDim2.new(1, 0, 0, 26), 
+            ZIndex = 3, 
+            AutoButtonColor = false, 
+            Font = Enum.Font.Gotham, 
+            Text = "", 
+            TextSize = 14 
+        }, { 
+            utility:Create("TextLabel", { 
+                Name = "Title", 
+                AnchorPoint = Vector2.new(0, 0.5), 
+                BackgroundTransparency = 1, 
+                Position = UDim2.new(0, 40, 0.5, 0), 
+                Size = UDim2.new(0, 76, 1, 0), 
+                ZIndex = 3, 
+                Font = Enum.Font.Gotham, 
+                Text = title, 
+                TextColor3 = themes.TextColor, 
+                TextSize = 12, 
+                TextTransparency = 0.65, 
+                TextXAlignment = Enum.TextXAlignment.Left 
+            }), 
+            icon and utility:Create("ImageLabel", { 
+                Name = "Icon", 
+                AnchorPoint = Vector2.new(0, 0.5), 
+                BackgroundTransparency = 1, 
+                Position = UDim2.new(0, 12, 0.5, 0), 
+                Size = UDim2.new(0, 16, 0, 16), 
+                ZIndex = 3, 
+                Image = "rbxassetid://" .. tostring(icon), 
+                ImageColor3 = themes.TextColor, 
+                ImageTransparency = 0.64 
+            }) or {} 
+        }) 
+        local container = utility:Create("ScrollingFrame", { 
+            Name = title, 
+            Parent = library.container.Main, 
+            Active = true, 
+            BackgroundTransparency = 1, 
+            BorderSizePixel = 0, 
+            Position = UDim2.new(0, 134, 0, 46), 
+            Size = UDim2.new(1, -142, 1, -56), 
+            CanvasSize = UDim2.new(0, 0, 0, 466), 
+            ScrollBarThickness = 3, 
+            ScrollBarImageColor3 = themes.DarkContrast, 
+            Visible = false 
+        }, { 
+            utility:Create("UIListLayout", { 
+                SortOrder = Enum.SortOrder.LayoutOrder, 
+                Padding = UDim.new(0, 10) 
+            }) 
+        }) 
+        return setmetatable({ 
+            library = library, 
+            container = container, 
+            button = button, 
+            sections = {} 
+        }, page) 
+    end 
+
+    function page:Resize(scroll) 
+        local padding = 10 
+        local size = 0 
+        for i, section in pairs(self.sections) do 
+            size = size + section.container.Parent.AbsoluteSize.Y + padding 
+        end 
+        self.container.CanvasSize = UDim2.new(0, 0, 0, size) 
+        self.container.ScrollBarImageTransparency = size > self.container.AbsoluteSize.Y 
+        if scroll then 
+            utility:Tween(self.container, {CanvasPosition = Vector2.new(0, self.lastPosition or 0)}, 0.2) 
+        end 
+    end 
+
+    function library:SelectPage(page, toggle) 
+        if toggle and self.focusedPage == page then 
+            return 
+        end 
+        local button = page.button 
+        if toggle then 
+            button.Title.TextTransparency = 0 
+            button.Title.Font = Enum.Font.GothamSemibold 
+            if button:FindFirstChild("Icon") then 
+                button.Icon.ImageTransparency = 0 
+            end 
+            local focusedPage = self.focusedPage 
+            self.focusedPage = page 
+            if focusedPage then 
+                self:SelectPage(focusedPage) 
+            end 
+            page:Resize() 
+            for i, section in pairs(page.sections) do 
+                section.container.Parent.ImageTransparency = 0 
+            end 
+            wait(0.1) 
+            page.container.Visible = true 
+            if focusedPage then 
+                focusedPage.container.Visible = false 
+            end 
+        else 
+            button.Title.Font = Enum.Font.Gotham 
+            button.Title.TextTransparency = 0.65 
+            if button:FindFirstChild("Icon") then 
+                button.Icon.ImageTransparency = 0.65 
+            end 
+            for i, section in pairs(page.sections) do 
+                utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 0.1) 
+            end 
+            wait(0.1) 
+            page.lastPosition = page.container.CanvasPosition.Y 
+            page:Resize() 
+        end 
+    end 
+end 
+
+return library
